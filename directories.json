@@ -1,0 +1,11 @@
+{
+    "root": "mobile_store/",
+    "paths": [
+        {
+            "path": "users.json",
+            "type": "FILE",
+            "initContent": "[]"
+        }
+    ],
+    "users": "mobile_store/users.json"
+}
