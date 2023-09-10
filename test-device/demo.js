@@ -1,0 +1,1 @@
+export default (value = 'Joe') => "hello world " + value
