@@ -2,17 +2,9 @@
     "root": "mobile_store/",
     "paths": [
         {
-            "path": "sales/",
-            "type": "DIRECTORY"
-        },
-        {
             "path": "users.json",
             "type": "FILE",
             "initContent": "[]"
-        },
-        {
-            "path": "products/",
-            "type": "DIRECTORY"
         }
     ],
     "users": "mobile_store/users.json"

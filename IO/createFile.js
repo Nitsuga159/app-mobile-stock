@@ -1,8 +1,9 @@
 import * as FileSystem from 'expo-file-system';
 import FileError from '../errors/FileError';
+import { APP_PATH } from '../env';
 
 export default async function({ fileName, content, isCompleted = false }) {
-    const pathFile = isCompleted ? fileName : FileSystem.documentDirectory + fileName
+    const pathFile = isCompleted ? fileName : APP_PATH + fileName
 
     const file = await FileSystem.getInfoAsync(pathFile);
 

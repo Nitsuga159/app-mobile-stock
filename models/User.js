@@ -17,17 +17,12 @@ export default class User {
        return this.#id 
     }
 
-    static setUserCollection(users) {
-        if(Array.isArray(users)) {
-            User.#users = users.map(user => new User(user))
-        }
+    static toJsonUsers(users) {
+        return JSON.stringify(
+            users.map(user => ({ username: user.getUsername(), birthday: user.getBirthday(), id: user.getId() }))
+        )
     }
 
-    static getUserCollection() {
-        return this.#users
-    }
-
-    static #users;
     #id
     #username
     #birthday

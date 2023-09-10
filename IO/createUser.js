@@ -2,9 +2,9 @@ import * as FileSystem from 'expo-file-system'
 import directories from '../directories.json'
 import User from '../models/User';
 import UserError from '../errors/UserError'
-import * as Random from 'expo-random';
 import 'react-native-get-random-values'
 import { v4 } from 'uuid';
+import createDirectory from './createDirectory';
 
 export default async function({ username, birthday }) {
     const usersPath = FileSystem.documentDirectory + directories.users
@@ -29,13 +29,16 @@ export default async function({ username, birthday }) {
 
     users.push({ username, birthday, id })
 
-    alert(JSON.stringify(users))
-
     try {
         await FileSystem.writeAsStringAsync(usersPath, JSON.stringify(users))
     } catch(e) {
         throw new UserError(`Cannot read users.json file`, e)
     }
+
+    await Promise.all([
+        createDirectory({ directoryName: `mobile_store/${user.getId()}/${'sales'}` }),
+        createDirectory({ directoryName: `mobile_store/${user.getId()}/${'products'}` })
+    ])
 
     return user
 }

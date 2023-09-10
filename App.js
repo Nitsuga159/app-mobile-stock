@@ -1,59 +1,58 @@
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import Register from './views/Register';
-import { useEffect, useState } from 'react';
-import Loading from './views/Loading';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useContext, useEffect } from 'react';
 import IO from './IO';
-import Users from './views/Users';
-import Home from './views/Home';
 import User from './models/User';
-import FileError from './errors/FileError';
 import { setEnvironmentPaths } from './config';
-
-const VIEWS = {
-  REGISTER: 0,
-  HOME: 1,
-  USERS: 2,
-  LOADING: 3
-}
+import { VIEWS } from './env';
+import GlobalContextProvider, { GlobalContext } from './context/global';
+import logger from './logger';
+import Test from './components/Test/Test';
+import allViews from './views';
+import MenuProvider from './context/Menu';
 
 export default function App() {
-  const [view, setView] = useState(VIEWS.LOADING);
+
+  return (
+    <GlobalContextProvider>
+      <Start />
+      <Test />
+    </GlobalContextProvider>
+  );
+}
+
+export function Start() {
+  const { globalState: { view }, setGlobalState } = useContext(GlobalContext);
 
   useEffect(() => {
-    IO
-      .getUsers().then(users => {
-      if(users.length) {
-        User.setUserCollection(users);
-
-        setView(VIEWS.USERS)
-      } else {
-        setView(VIEWS.REGISTER)
-      }
-    })
-    .catch((e) => e instanceof FileError && setView(VIEWS.REGISTER));
-
     try {
       setEnvironmentPaths();
     } catch(e) {
       console.error(`Error trying to set environtment paths: ${e.message}`)
     }
+
+    IO
+    .getUsers()
+    .then(users => {
+      logger.info(App, "Get users", users)
+
+      if(!users.length) {
+        return setGlobalState({view: VIEWS.REGISTER})
+      }
+
+      setGlobalState({view: VIEWS.USERS, users: users.map(user => new User(user))})
+    })
+    .catch(() => setGlobalState({view: VIEWS.REGISTER}))
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-        <StatusBar style="light" translucent={false} />
-        {
-          VIEWS.LOADING === view ? 
-          <Loading /> : 
-          VIEWS.USERS === view ? 
-          <Users /> :
-          VIEWS.HOME === view ?
-          <Home /> :
-          <Register />
-        }
-    </ScrollView>
-  );
+    <MenuProvider>
+      <ScrollView contentContainerStyle={styles.container}>
+            <StatusBar style="light" translucent={false} />
+            {allViews[view]}
+      </ScrollView>
+    </MenuProvider>
+  )
 }
 
 const styles = StyleSheet.create({
